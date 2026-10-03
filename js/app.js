@@ -1,6 +1,5 @@
 // ==========================================
 // 1. Firebase Configuration
-// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyBvtjbfsjgVkNP_Fz1oHyqXpr-nIMBcu8c",
   authDomain: "bodycare-inventory.firebaseapp.com",
@@ -405,9 +404,9 @@ function renderSidebarAndWidgets(t) {
         const outStock = inventoryData.filter(i => i.qty === 0).length;
         
         widgetsHtml = `
-            <div class="stat-card primary"><div class="info"><p>${t.widgetAdmin1}</p><h3>${inventoryData.length}</h3></div><div class="stat-icon"><i class="fas fa-box-open"></i></div></div>
-            <div class="stat-card warning"><div class="info"><p>${t.widgetAdmin2}</p><h3>${lowStock}</h3></div><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div></div>
-            <div class="stat-card danger"><div class="info"><p>${t.widgetAdmin3}</p><h3>${outStock}</h3></div><div class="stat-icon"><i class="fas fa-ban"></i></div></div>
+            <div class="stat-card primary" onclick="filterInventory('all')" style="cursor: pointer;" title="คลิกดูพัสดุทั้งหมด"><div class="info"><p>${t.widgetAdmin1}</p><h3>${inventoryData.length}</h3></div><div class="stat-icon"><i class="fas fa-box-open"></i></div></div>
+            <div class="stat-card warning" onclick="filterInventory('low')" style="cursor: pointer;" title="คลิกดูของใกล้หมด"><div class="info"><p>${t.widgetAdmin2}</p><h3>${lowStock}</h3></div><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div></div>
+            <div class="stat-card danger" onclick="filterInventory('out')" style="cursor: pointer;" title="คลิกดูของหมดสต๊อก"><div class="info"><p>${t.widgetAdmin3}</p><h3>${outStock}</h3></div><div class="stat-icon"><i class="fas fa-ban"></i></div></div>
         `;
     } else {
         document.getElementById('btn-action-text').innerText = t.btnUser;
@@ -424,13 +423,36 @@ function renderSidebarAndWidgets(t) {
         const available = inventoryData.filter(i => i.qty > 0).length;
         
         widgetsHtml = `
-            <div class="stat-card success"><div class="info"><p>${t.widgetUser1}</p><h3>${available}</h3></div><div class="stat-icon"><i class="fas fa-check-circle"></i></div></div>
-            <div class="stat-card warning"><div class="info"><p>${t.widgetUser2}</p><h3>${myPending}</h3></div><div class="stat-icon"><i class="fas fa-clock"></i></div></div>
-            <div class="stat-card primary"><div class="info"><p>${t.widgetUser3}</p><h3>${myApproved}</h3></div><div class="stat-icon"><i class="fas fa-clipboard-check"></i></div></div>
+            <div class="stat-card success" onclick="filterInventory('available')" style="cursor: pointer;"><div class="info"><p>${t.widgetUser1}</p><h3>${available}</h3></div><div class="stat-icon"><i class="fas fa-check-circle"></i></div></div>
+            <div class="stat-card warning" onclick="switchTab('sec-approvals')" style="cursor: pointer;"><div class="info"><p>${t.widgetUser2}</p><h3>${myPending}</h3></div><div class="stat-icon"><i class="fas fa-clock"></i></div></div>
+            <div class="stat-card primary" onclick="switchTab('sec-approvals')" style="cursor: pointer;"><div class="info"><p>${t.widgetUser3}</p><h3>${myApproved}</h3></div><div class="stat-icon"><i class="fas fa-clipboard-check"></i></div></div>
         `;
     }
     document.getElementById('nav-menu').innerHTML = menuHtml;
     document.getElementById('dashboard-widgets').innerHTML = widgetsHtml;
+}
+
+// 🌟 ฟังก์ชันใหม่: กรองข้อมูลตารางเมื่อกดที่ Card ด้านบน
+function filterInventory(filterType) {
+    const t = translations[currentLang];
+    let filteredData = [];
+    
+    // เคลียร์ข้อความในช่องค้นหา (ถ้ามี)
+    const searchInput = document.getElementById('search-inventory');
+    if (searchInput) searchInput.value = '';
+
+    if (filterType === 'all') {
+        filteredData = inventoryData; // ดูทั้งหมด
+    } else if (filterType === 'low') {
+        filteredData = inventoryData.filter(i => i.qty > 0 && i.qty <= i.alertLimit); // ของใกล้หมด
+    } else if (filterType === 'out') {
+        filteredData = inventoryData.filter(i => i.qty === 0); // ของหมดสต๊อก
+    } else if (filterType === 'available') {
+        filteredData = inventoryData.filter(i => i.qty > 0); // ของที่พร้อมเบิก (สำหรับพนักงาน)
+    }
+    
+    // วาดตารางใหม่ตามเงื่อนไขที่กด
+    renderInventoryTable(t, filteredData);
 }
 
 //  ปรับปรุงการวาดตารางให้มีคอลัมน์ จัดการ (แก้ไข/ลบ) โผล่มาเฉพาะตอนเป็น Admin
