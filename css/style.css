@@ -363,7 +363,7 @@ tr:hover td { background-color: #f8fafc; }
     .main-content {
         margin-left: 0 !important; /* ยกเลิก margin ซ้ายที่เผื่อไว้ให้ Sidebar */
         width: 100% !important;
-        padding-bottom: 80px !important; /* เผื่อพื้นที่ด้านล่างไม่ให้เมนูบัง */
+        padding-bottom: 120px !important; /* เผื่อพื้นที่ด้านล่างไม่ให้เมนูบัง */
     }
     
     /* 4. ปรับตารางให้แสดงผลบนมือถือได้ (เลื่อนซ้ายขวาได้) */
