@@ -1,4 +1,4 @@
-// ==========================================
+// =====================================
 // 1. Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBvtjbfsjgVkNP_Fz1oHyqXpr-nIMBcu8c",
@@ -164,7 +164,7 @@ function switchTab(secId, element) {
 function fetchDatabaseRealtime() {
     unsubscribeInventory = db.collection("inventory").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
         inventoryData = []; snapshot.forEach((doc) => inventoryData.push({ dbId: doc.id, ...doc.data() })); 
-        searchInventory(); 
+        updateUI(); 
     });
 
     unsubscribeRequests = db.collection("requests").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
